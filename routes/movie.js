@@ -35,4 +35,17 @@ router.get('/:id', (req, res, next) => {
         .json({ movie: db[req.params.id] });
 });
 
+router.put('/:id', (req, res, next) => {
+    // console.log(`[/movie/${req.params.id}] PUT: ${req.body}`)
+    if (!req.params.id && !req.body) {
+        res.status(403)
+            .json({ error: true, message: 'bad request, empty params:id' })
+    }
+    let new_movie = req.body;
+    new_movie._id = parseInt(req.params.id, 10);
+    db[new_movie._id] = new_movie;
+    res.status(200)
+        .json({ movie: db[new_movie._id] });
+});
+
 module.exports = router;
