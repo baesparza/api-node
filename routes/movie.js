@@ -48,4 +48,16 @@ router.put('/:id', (req, res, next) => {
         .json({ movie: db[new_movie._id] });
 });
 
+router.delete('/:id', (req, res, next) => {
+    // console.log(`[/movie/${req.params.id}] DELETE`)
+    if (!req.params.id) {
+        res.status(403)
+            .json({ error: true, message: 'bad request, empty params:id' })
+    }
+
+    delete db[req.params.id];
+    res.status(400)
+        .json({});
+})
+
 module.exports = router;
