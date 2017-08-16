@@ -175,4 +175,35 @@ describe('La ruta de peliculas', () => {
                 }, done);
         });
     });
+
+    describe('Elimina una pelicula', () => {
+        it('deberia eliminar una pelicula por su id', (done) => {
+            let movie_id = 0;
+            let movie = {
+                'title': 'The wolf of Wall Street',
+                'year': '2013'
+            }
+
+            request
+                .post('/movie')
+                .set('Accept', 'application/json')
+                .send(movie)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
+                .then((res) => {
+                    movie_id = res.body.movie._id;
+                    return request
+                        .delete(`/movie/${movie_id}`)
+                        .set('Accept', 'application/json')
+                        .expect(400)
+                        .expect('Content-Type', /application\/json/)
+                }, done).then((res) => {
+                    let body = res.body;
+
+                    expect(body).to.be.empty;
+
+                    done();
+                }, done);
+        });
+    });
 });
