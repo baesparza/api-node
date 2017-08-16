@@ -108,14 +108,12 @@ describe('La ruta de peliculas', () => {
             }
 
             request
-                // post the first movie
                 .post('/movie')
                 .set('Accept', 'application/json')
                 .send(movie)
                 .expect(201)
                 .expect('Content-Type', /application\/json/)
                 .then((res) => {
-                    // get all the movies
                     movie_id = res.body.movie._id;
                     return request
                         .get(`/movie/${movie_id}`)
@@ -123,7 +121,6 @@ describe('La ruta de peliculas', () => {
                         .expect(200)
                         .expect('Content-Type', /application\/json/)
                 }, done).then((res) => {
-                    // get response
                     let body = res.body;
 
                     expect(body).to.have.property('movie');
@@ -131,6 +128,47 @@ describe('La ruta de peliculas', () => {
 
                     expect(movie).to.have.property('_id', movie_id);
                     expect(movie).to.have.property('title', 'El lobo de Wall Street');
+                    expect(movie).to.have.property('year', '2013');
+
+                    done();
+                }, done);
+        });
+    });
+
+    describe('Una peticion put', () => {
+        it('Deberia modificar una pelicula', (done) => {
+            let movie_id = 0;
+            let movie = {
+                'title': 'The wolf of Wall Street',
+                'year': '2000'
+            }
+            let movie_correcta = {
+                'title': 'The wolf of Wall Street',
+                'year': '2013'
+            }
+
+            request
+                .post('/movie')
+                .set('Accept', 'application/json')
+                .send(movie)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
+                .then((res) => {
+                    movie_id = res.body.movie._id;
+                    return request
+                        .put(`/movie/${movie_id}`)
+                        .send(movie_correcta)
+                        .set('Accept', 'application/json')
+                        .expect(200)
+                        .expect('Content-Type', /application\/json/)
+                }, done).then((res) => {
+                    let body = res.body;
+
+                    expect(body).to.have.property('movie');
+                    let movie = body.movie;
+
+                    expect(movie).to.have.property('_id', movie_id);
+                    expect(movie).to.have.property('title', 'The wolf of Wall Street');
                     expect(movie).to.have.property('year', '2013');
 
                     done();
