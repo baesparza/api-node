@@ -1,9 +1,10 @@
+var _ = require('lodash');
 var express = require('express');
 var router = express.Router();
 
-var db = {}
+var db = {};
 
-router.post('/', function (req, res, next) {
+router.post('/', (req, res, next) => {
     // console.log('[/movies] POST:', req.body)
     if (!req.body) {
         res.status(403)
@@ -15,7 +16,13 @@ router.post('/', function (req, res, next) {
     db[_movie._id] = _movie;
 
     res.status(201)
-    .json({movie: db[_movie._id]});
+        .json({ movie: db[_movie._id] });
 });
+
+router.get('/', (req, res, next) => {
+    // console.log('[/movies] GET:', req.body)
+    res.status(200)
+        .json({ movies: _.values(db) })
+})
 
 module.exports = router;
