@@ -98,4 +98,43 @@ describe('La ruta de peliculas', () => {
                 }, done);
         });
     });
+
+    describe('Obtener uns pelicula por su id', () => {
+        it('Deberia obtener una pelicula', (done) => {
+            let movie_id = 0;
+            let movie = {
+                'title': 'El lobo de Wall Street',
+                'year': '2013'
+            }
+
+            request
+                // post the first movie
+                .post('/movie')
+                .set('Accept', 'application/json')
+                .send(movie)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
+                .then((res) => {
+                    // get all the movies
+                    movie_id = res.body.movie._id;
+                    return request
+                        .get(`/movie/${movie_id}`)
+                        .set('Accept', 'application/json')
+                        .expect(200)
+                        .expect('Content-Type', /application\/json/)
+                }, done).then((res) => {
+                    // get response
+                    let body = res.body;
+
+                    expect(body).to.have.property('movie');
+                    let movie = body.movie;
+
+                    expect(movie).to.have.property('_id', movie_id);
+                    expect(movie).to.have.property('title', 'El lobo de Wall Street');
+                    expect(movie).to.have.property('year', '2013');
+
+                    done();
+                }, done);
+        });
+    });
 });
