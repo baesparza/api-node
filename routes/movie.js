@@ -1,8 +1,8 @@
-var _ = require('lodash');
-var express = require('express');
-var router = express.Router();
-
-var db = {};
+const _ = require('lodash');
+const express = require('express');
+const router = express.Router();
+const mongoose = require('mongoose');
+const Movie = require('../lib/model/movie');
 
 router.post('/', (req, res, next) => {
     // console.log('[/movie] POST:', req.body)
@@ -10,20 +10,30 @@ router.post('/', (req, res, next) => {
         res.status(403)
             .json({ error: true, message: 'Empty post' });
     }
+
     let _movie = req.body;
-    _movie._id = Date.now();
 
-    db[_movie._id] = _movie;
+    new Movie({
+        title: _movie.title,
+        year: _movie.year
+    }).save((err, movies) => {
+        res.status(201)
+            .json({ movie: movies });
 
-    res.status(201)
-        .json({ movie: db[_movie._id] });
+    });
 });
 
 router.get('/', (req, res, next) => {
     // console.log('[/movie] GET')
-    res.status(200)
-        .json({ movies: _.values(db) })
-})
+    Movie.find({}, (err, movies) => {
+        if (err) {
+            res.status(403)
+                .json({ error: true, message: 'bad request' })
+        }
+        res.status(200)
+            .json({ movies: movies })
+    });
+});
 
 router.get('/:id', (req, res, next) => {
     // console.log(`[/movie/${req.params.id}] GET`)
@@ -31,8 +41,14 @@ router.get('/:id', (req, res, next) => {
         res.status(403)
             .json({ error: true, message: 'bad request, empty params:id' })
     }
-    res.status(200)
-        .json({ movie: db[req.params.id] });
+    Movie.findOne({ _id: req.params.id }, (err, movies) => {
+        if (err) {
+            res.status(404)
+                .json({ error: true, message: 'Movie not found' })
+        }
+        res.status(200)
+            .json({ movie: movies });
+    });
 });
 
 router.put('/:id', (req, res, next) => {
@@ -41,11 +57,17 @@ router.put('/:id', (req, res, next) => {
         res.status(403)
             .json({ error: true, message: 'bad request, empty params:id' })
     }
-    let new_movie = req.body;
-    new_movie._id = parseInt(req.params.id, 10);
-    db[new_movie._id] = new_movie;
-    res.status(200)
-        .json({ movie: db[new_movie._id] });
+    Movie.findByIdAndUpdate(req.params.id, {
+        title: req.body.title,
+        year: req.body.year
+    }, { new: true }, (err, movies) => {
+        if (err) {
+            res.status(404)
+                .json({ error: true, message: 'Movie not found' })
+        }
+        res.status(200)
+            .json({ movie: movies });
+    });
 });
 
 router.delete('/:id', (req, res, next) => {
@@ -54,10 +76,14 @@ router.delete('/:id', (req, res, next) => {
         res.status(403)
             .json({ error: true, message: 'bad request, empty params:id' })
     }
-
-    delete db[req.params.id];
-    res.status(400)
-        .json({});
+    Movie.findByIdAndRemove(req.params.id, (err, movies) => {
+        if (err) {
+            res.status(404)
+                .json({ error: true, message: 'Movie not found' })
+        }
+        res.status(400)
+            .json({});
+    });
 })
 
 module.exports = router;

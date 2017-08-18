@@ -1,13 +1,24 @@
 let request = require('supertest-as-promised');
 const api = require('../app');
 const host = api;
-let chai = require('chai');
-let _ = require('lodash');
+const chai = require('chai');
+const _ = require('lodash');
+const mongoose = require('mongoose');
+const config = require('../lib/config/index');
 
 let expect = chai.expect;
 request = request(host)
 
 describe('La ruta de peliculas', () => {
+    before(() => {
+        mongoose.connect(config.database);
+    });
+
+    after((done) => {
+        mongoose.disconnect(done);
+        mongoose.models = {}
+    })
+
     /* post a movie */
     describe('Una peticion post', () => {
         it('Deberia crear una pelicula', (done) => {
