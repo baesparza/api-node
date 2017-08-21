@@ -19,7 +19,7 @@ describe('Ruta Users', () => {
     });
 
     describe('Post', () => {
-        it.only('Deberia crear un usuario', (done) => {
+        it('Deberia crear un usuario', (done) => {
             let usuario = {
                 'nombre': 'Bruno',
                 'apellido': 'Esparza',
