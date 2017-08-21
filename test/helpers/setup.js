@@ -5,5 +5,5 @@ const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiAsPromised);
 
-GLOBAL.AssertionError = chai.AssertionError;
-GLOBAL.exprect = chai.exprect;
+global.AssertionError = chai.AssertionError;
+global.exprect = chai.exprect;
